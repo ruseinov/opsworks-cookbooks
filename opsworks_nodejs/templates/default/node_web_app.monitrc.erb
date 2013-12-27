@@ -5,3 +5,8 @@ check host node_web_app_<%= @application_name %> with address 127.0.0.1
     request /
     with timeout 10 seconds
     then restart
+
+check process node with pidfile /var/run/node_worker.pid
+  start = "/bin/sh -c 'cd <%= @deploy[:deploy_to] %>/current; /usr/bin/env NODE_PATH=<%= @deploy[:deploy_to] %>/current/node_modules:<%= @deploy[:deploy_to] %>/current /usr/local/bin/node <%= @monitored_script %> --worker=true'"
+  stop = "/usr/bin/kill `cat /var/run/node_worker.pid`"
+  if 5 restarts within 5 cycles then timeout
